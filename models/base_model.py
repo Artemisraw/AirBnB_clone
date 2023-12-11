@@ -12,8 +12,9 @@ class BaseModel:
     """
     def __init__(self, *args, **kwags):
         self.id = str(uuid.uuid1())
-        self.created_at = datetime.datetime.now()
-        self.updated_at = datetime.datetime.now()
+        self.created_at = datetime.datetime.now().isoformat()
+        self.updated_at = datetime.datetime.now().isoformat()
+        storage.new(self.__dict__, self.__class__.__name__)
 
     def __str__(self):
         return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__} "

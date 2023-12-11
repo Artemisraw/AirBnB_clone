@@ -1,0 +1,59 @@
+class FileStorage:
+    def __init__(self, file_path='file.json'):
+        self.__file_path = file_path
+        self.__objects = {}
+
+    def all(self):
+        return self.__objects
+
+    def new(self, obj):
+        class_name = obj.__class__.__name__
+        key = f"{class_name}.{obj.id}"
+        self.__objects[key] = obj
+
+    def save(self):
+        serialized_objects = {}
+        for key, obj in self.__objects.items():
+            serialized_objects[key] = obj.to_dict()
+        
+        with open(self.__file_path, 'w') as file:
+            json.dump(serialized_objects, file)
+
+    def reload(self):
+        try:
+            with open(self.__file_path, 'r') as file:
+                loaded_objects = json.load(file)
+                for key, value in loaded_objects.items():
+                    class_name, obj_id = key.split('.')
+                    # Create instances of respective classes from the loaded data and store in __objects
+                    # Example: Use the class_name and obj_id to create instances and store in self.__objects
+                    
+        except FileNotFoundError:
+            pass  # If the file doesn't exist, do nothing without raising an exception
+
+models/init.py
+
+python
+
+from models.engine.file_storage import FileStorage
+
+storage = FileStorage()
+storage.reload()
+
+models/base_model.py
+
+python
+
+from models import storage
+
+class BaseModel:
+    def __init__(self, *args, **kwargs):
+        # Your existing __init__ method code
+
+        # Link BaseModel to FileStorage
+        if kwargs.get('__class__') is None:  # Check if it's not being created from a dictionary representation
+            storage.new(self)
+
+    def save(self):
+        storage.save()
+
