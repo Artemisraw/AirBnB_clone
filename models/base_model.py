@@ -14,7 +14,9 @@ class BaseModel:
         self.id = str(uuid.uuid1())
         self.created_at = datetime.datetime.now().isoformat()
         self.updated_at = datetime.datetime.now().isoformat()
-        storage.new(self.__dict__, self.__class__.__name__)
+        
+        if not kwags:
+            storage.new(self)
 
     def __str__(self):
         return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__} "
@@ -27,10 +29,9 @@ class BaseModel:
         self.__dict__.update(
             {
                 "__class__": self.__class__.__name__,
-                "updated_at": self.updated_at.isoformat(),
+                "updated_at": self.updated_at,
                 "id": self.id,
-                "created_at": self.created_at.isoformat(),
+                "created_at": self.created_at,
             }
         )
-        storage.new(self._dict__)
         return self.__dict__
